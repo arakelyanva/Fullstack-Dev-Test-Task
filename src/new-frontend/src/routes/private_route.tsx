@@ -3,6 +3,7 @@ import Dashboard from '../pages/Dashboard';
 import ErrorPage from '../pages/ErrorPage';
 import Items from '../pages/Items';
 import Layout from '../pages/Layout';
+import Metrics from '../pages/Metrics';
 import UserSettings from '../pages/UserSettings';
 
 export default function privateRoutes() {
@@ -15,6 +16,7 @@ export default function privateRoutes() {
             { path: '/', element: <Dashboard /> },
             { path: 'items', element: <Items /> },
             { path: 'admin', element: <Admin /> },
+            { path: 'metrics', element: <Metrics /> },
             { path: 'settings', element: <UserSettings /> },
         ],
     };

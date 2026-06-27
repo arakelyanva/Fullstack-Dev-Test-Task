@@ -16,11 +16,11 @@ export class UtilsService {
      * @returns Message Successful Response
      * @throws ApiError
      */
-    public static testCelery({
-requestBody,
-}: {
-requestBody: Message,
-}): CancelablePromise<Message> {
+    public static utilsTestCelery({
+        requestBody,
+    }: {
+        requestBody: Message,
+    }): CancelablePromise<Message> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/utils/test-celery/',
@@ -38,11 +38,11 @@ requestBody: Message,
      * @returns Message Successful Response
      * @throws ApiError
      */
-    public static testEmail({
-emailTo,
-}: {
-emailTo: string,
-}): CancelablePromise<Message> {
+    public static utilsTestEmail({
+        emailTo,
+    }: {
+        emailTo: string,
+    }): CancelablePromise<Message> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/utils/test-email/',

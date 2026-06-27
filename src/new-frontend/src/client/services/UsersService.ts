@@ -19,17 +19,17 @@ export class UsersService {
 
     /**
      * Read Users
-     * Retrieve users.
+     * Retrieve users. Allowed for admin and manager.
      * @returns UsersOut Successful Response
      * @throws ApiError
      */
-    public static readUsers({
-skip,
-limit = 100,
-}: {
-skip?: number,
-limit?: number,
-}): CancelablePromise<UsersOut> {
+    public static usersReadUsers({
+        skip,
+        limit = 100,
+    }: {
+        skip?: number,
+        limit?: number,
+    }): CancelablePromise<UsersOut> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users/',
@@ -45,15 +45,15 @@ limit?: number,
 
     /**
      * Create User
-     * Create new user.
+     * Create new user. Admin only.
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static createUser({
-requestBody,
-}: {
-requestBody: UserCreate,
-}): CancelablePromise<UserOut> {
+    public static usersCreateUser({
+        requestBody,
+    }: {
+        requestBody: UserCreate,
+    }): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/users/',
@@ -71,7 +71,7 @@ requestBody: UserCreate,
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static readUserMe(): CancelablePromise<UserOut> {
+    public static usersReadUserMe(): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users/me',
@@ -80,15 +80,15 @@ requestBody: UserCreate,
 
     /**
      * Update User Me
-     * Update own user.
+     * Update own user. Role is intentionally absent from UserUpdateMe to prevent escalation.
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static updateUserMe({
-requestBody,
-}: {
-requestBody: UserUpdateMe,
-}): CancelablePromise<UserOut> {
+    public static usersUpdateUserMe({
+        requestBody,
+    }: {
+        requestBody: UserUpdateMe,
+    }): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/users/me',
@@ -106,11 +106,11 @@ requestBody: UserUpdateMe,
      * @returns Message Successful Response
      * @throws ApiError
      */
-    public static updatePasswordMe({
-requestBody,
-}: {
-requestBody: UpdatePassword,
-}): CancelablePromise<Message> {
+    public static usersUpdatePasswordMe({
+        requestBody,
+    }: {
+        requestBody: UpdatePassword,
+    }): CancelablePromise<Message> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/users/me/password',
@@ -124,15 +124,15 @@ requestBody: UpdatePassword,
 
     /**
      * Create User Open
-     * Create new user without the need to be logged in.
+     * Create new user without the need to be logged in. Role is always member.
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static createUserOpen({
-requestBody,
-}: {
-requestBody: UserCreateOpen,
-}): CancelablePromise<UserOut> {
+    public static usersCreateUserOpen({
+        requestBody,
+    }: {
+        requestBody: UserCreateOpen,
+    }): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/users/open',
@@ -146,15 +146,15 @@ requestBody: UserCreateOpen,
 
     /**
      * Read User By Id
-     * Get a specific user by id.
+     * Get a specific user by id. Any user can read their own profile; reading others requires USER_READ_ANY.
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static readUserById({
-userId,
-}: {
-userId: number,
-}): CancelablePromise<UserOut> {
+    public static usersReadUserById({
+        userId,
+    }: {
+        userId: number,
+    }): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users/{user_id}',
@@ -169,17 +169,17 @@ userId: number,
 
     /**
      * Update User
-     * Update a user.
+     * Update a user. Admin only. Includes role assignment.
      * @returns UserOut Successful Response
      * @throws ApiError
      */
-    public static updateUser({
-userId,
-requestBody,
-}: {
-userId: number,
-requestBody: UserUpdate,
-}): CancelablePromise<UserOut> {
+    public static usersUpdateUser({
+        userId,
+        requestBody,
+    }: {
+        userId: number,
+        requestBody: UserUpdate,
+    }): CancelablePromise<UserOut> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/users/{user_id}',
@@ -196,15 +196,16 @@ requestBody: UserUpdate,
 
     /**
      * Delete User
-     * Delete a user.
+     * Delete a user. Any user can delete their own account (except admins).
+     * Deleting another user requires USER_DELETE_ANY (admin only).
      * @returns Message Successful Response
      * @throws ApiError
      */
-    public static deleteUser({
-userId,
-}: {
-userId: number,
-}): CancelablePromise<Message> {
+    public static usersDeleteUser({
+        userId,
+    }: {
+        userId: number,
+    }): CancelablePromise<Message> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/users/{user_id}',

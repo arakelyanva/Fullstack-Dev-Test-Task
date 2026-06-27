@@ -47,7 +47,7 @@ const UserInformation: React.FC = () => {
                         <FormLabel color={color} htmlFor='name'>Full name</FormLabel>
                         {
                             editMode ?
-                                <Input id='name' {...register('full_name')} defaultValue={user?.full_name} type='text' size='md' /> :
+                                <Input id='name' {...register('full_name')} defaultValue={user?.full_name ?? undefined} type='text' size='md' /> :
                                 <Text size='md' py={2}>
                                     {user?.full_name || 'N/A'}
                                 </Text>

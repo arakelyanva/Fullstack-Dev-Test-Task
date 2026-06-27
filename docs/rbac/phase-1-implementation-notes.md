@@ -1,64 +1,62 @@
-# Phase 1 - Implementation Notes
+# Phase 1 & 2 - Implementation Notes
 
 Notes captured during implementation for follow-up in later phases.
 
 ---
 
-## Existing tests that reference `is_superuser` (address in Phase 3)
+## Actual codebase structure (differs from phase docs)
 
-After removing `is_superuser` from `UserBase`, three test files have references that need updating:
+The phase docs were written against the *newer* full-stack-fastapi-template (UUID IDs, `pyjwt`,
+TanStack Router). After the rebase, the actual working code is the **older** template version:
 
-### `backend/tests/crud/test_user.py` — breaks after Phase 1
+| Concern | Phase docs assumed | Actual location |
+|---|---|---|
+| Backend source | `backend/app/` | `src/backend/app/` |
+| Frontend source | `frontend/src/` | `src/new-frontend/src/` |
+| Route files | `api/routes/*.py` | `api/api_v1/endpoints/*.py` |
+| Router registry | `api/main.py` | `api/api_v1/api.py` |
+| DB seeding | `core/db.py` | `db/init_db.py` |
+| IDs | UUID | integer |
+| JWT library | `pyjwt` | `python-jose` |
+| Response model | `UserPublic` | `UserOut` |
+| Alembic head | `fe56fa70289e` | `e2412789c190` |
 
-These calls will fail with a validation error because `is_superuser` is no longer a field on
-`UserCreate` or `UserUpdate`:
-
-```python
-# line 56
-UserCreate(email=email, password=password, is_superuser=True)
-# line 72
-UserCreate(email=username, password=password, is_superuser=True)
-# line 83 / 86
-UserCreate(email=email, password=password, is_superuser=True)
-UserUpdate(password=new_password, is_superuser=True)
-```
-
-**Fix**: replace `is_superuser=True` with `role=Role.admin`. These should be updated before running
-the full test suite post-Phase-1. They are deferred to Phase 3 per the user's instruction.
-
-### `backend/tests/api/routes/test_users.py` — still passes (computed field)
-
-```python
-assert current_user["is_superuser"]       # line 22
-assert current_user["is_superuser"] is False  # line 33
-```
-
-These read `is_superuser` from the JSON response. Because `UserPublic` keeps `is_superuser` as a
-`@computed_field`, the API response still includes it and these assertions will continue to pass.
-
-### `backend/tests/api/routes/test_login.py` — still passes
-
-```python
-is_superuser=False,  # line 92
-```
-
-Same as above — reading from the response payload which still includes the derived field.
+All Phase 1 and Phase 2 changes have been applied to the **actual** locations.
 
 ---
 
-## `config.py` — `extra="ignore"` protects against unknown settings
+## Existing tests that reference `is_superuser` or expect old status codes (address in Phase 3)
 
-The `Settings` model already has `extra="ignore"`, so any pre-existing `.env` files that don't
-include `FIRST_MANAGER` / `FIRST_MEMBER` / `FIRST_MANAGER_PASSWORD` / `FIRST_MEMBER_PASSWORD` will
-simply skip those optional seeds without an error.
+### `src/backend/app/tests/api/api_v1/test_users.py`
+
+- **lines 17, 28**: `current_user["is_superuser"]` — reads from JSON response. Still passes
+  because `UserOut` keeps `is_superuser` as a `@computed_field`. No change needed.
+- **line 99**: `assert r.status_code == 400` — `test_create_user_by_normal_user` expects 400
+  (old `get_current_active_superuser` returned 400). After RBAC, `require_permission` returns
+  **403**. This test needs updating to `assert r.status_code == 403`.
+
+### `src/backend/app/tests/crud/test_user.py`
+
+- Any `UserCreate(..., is_superuser=True)` call will fail because `is_superuser` is no longer a
+  field. Change to `UserCreate(..., role=Role.admin)`.
+
+---
+
+## Delete-user bug fix (incidental, not RBAC)
+
+The original `delete_user` had a silent fall-through: if a non-superuser tried to delete
+*another* user, neither `if` nor `elif` matched, and the endpoint returned `None` with a 200.
+This was fixed as part of the Phase 2 rewrite — the handler now raises 403 in that case.
 
 ---
 
 ## Migration revision chain
 
 ```
-e2412789c190 → d98dd8ec85a3 → 1a31ce608336 → fe56fa70289e → 40f64d88faa2 (new head)
+e2412789c190 (initialize models) → a5b6c7d8e9f0 (add role to user, new head)
 ```
 
-The new migration (`40f64d88faa2`) sets `down_revision = "fe56fa70289e"`, which matches the
-confirmed current head before this phase.
+Migration file: `src/backend/app/alembic/versions/a5b6c7d8e9f0_add_role_to_user.py`
+
+The orphaned migration that was placed at `backend/app/alembic/versions/40f64d88faa2_add_role_to_user.py`
+(from the previous Phase 1 session, referencing a non-existent `fe56fa70289e` head) has been deleted.

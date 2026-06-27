@@ -23,7 +23,7 @@ const ResetPassword: React.FC = () => {
     const onSubmit: SubmitHandler<NewPasswordForm> = async (data) => {
         try {
             const token = new URLSearchParams(window.location.search).get('token');
-            await LoginService.resetPassword({
+            await LoginService.loginResetPassword({
                 requestBody: { new_password: data.new_password, token: token! }
             });
             showToast("Password reset.", "Your password has been reset successfully.", "success");

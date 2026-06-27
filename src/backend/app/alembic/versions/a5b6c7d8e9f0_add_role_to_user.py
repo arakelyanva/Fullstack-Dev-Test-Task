@@ -1,7 +1,7 @@
 """add role to user
 
-Revision ID: 40f64d88faa2
-Revises: fe56fa70289e
+Revision ID: a5b6c7d8e9f0
+Revises: e2412789c190
 Create Date: 2026-06-27
 
 """
@@ -9,8 +9,8 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision = "40f64d88faa2"
-down_revision = "fe56fa70289e"
+revision = "a5b6c7d8e9f0"
+down_revision = "e2412789c190"
 branch_labels = None
 depends_on = None
 

@@ -13,21 +13,21 @@ interface UsersStore {
 export const useUsersStore = create<UsersStore>((set) => ({
     users: [],
     getUsers: async () => {
-        const usersResponse = await UsersService.readUsers({ skip: 0, limit: 10 });
+        const usersResponse = await UsersService.usersReadUsers({ skip: 0, limit: 10 });
         set({ users: usersResponse.data });
     },
     addUser: async (user: UserCreate) => {
-        const userResponse = await UsersService.createUser({ requestBody: user });
+        const userResponse = await UsersService.usersCreateUser({ requestBody: user });
         set((state) => ({ users: [...state.users, userResponse] }));
     },
     editUser: async (id: number, user: UserUpdate) => {
-        const userResponse = await UsersService.updateUser({ userId: id, requestBody: user });
+        const userResponse = await UsersService.usersUpdateUser({ userId: id, requestBody: user });
         set((state) => ({
             users: state.users.map((user) => (user.id === id ? userResponse : user))
         }));
     },
     deleteUser: async (id: number) => {
-        await UsersService.deleteUser({ userId: id });
+        await UsersService.usersDeleteUser({ userId: id });
         set((state) => ({ users: state.users.filter((user) => user.id !== id) }));
     },
     resetUsers: () => {

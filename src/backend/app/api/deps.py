@@ -1,4 +1,5 @@
-from collections.abc import Generator
+import logging
+from collections.abc import Callable, Generator
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -9,8 +10,11 @@ from sqlmodel import Session
 
 from app.core import security
 from app.core.config import settings
+from app.core.permissions import Permission, has_permission
 from app.db.engine import engine
-from app.models import TokenPayload, User
+from app.models import Role, TokenPayload, User
+
+logger = logging.getLogger("app.authz")
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -48,9 +52,32 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+def require_permission(permission: Permission) -> Callable[[User], User]:
+    """Return a dependency that allows the request only if the current user's
+    role grants `permission`. Returns the user so handlers can reuse it."""
+
+    def dependency(current_user: CurrentUser) -> User:
+        if not has_permission(current_user.role, permission):
+            logger.warning(
+                "Authorization denied: user=%s role=%s permission=%s",
+                current_user.id,
+                current_user.role,
+                permission,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="The user doesn't have enough privileges",
+            )
+        return current_user
+
+    return dependency
+
+
 def get_current_active_superuser(current_user: CurrentUser) -> User:
-    if not current_user.is_superuser:
+    """Kept for backward compatibility. Prefer require_permission() in new routes."""
+    if current_user.role != Role.admin:
         raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges",
         )
     return current_user

@@ -91,6 +91,10 @@ class Settings(BaseSettings):
     # TODO: update type to EmailStr when sqlmodel supports it
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_PASSWORD: str
+    FIRST_MANAGER: str | None = None
+    FIRST_MANAGER_PASSWORD: str | None = None
+    FIRST_MEMBER: str | None = None
+    FIRST_MEMBER_PASSWORD: str | None = None
     USERS_OPEN_REGISTRATION: bool = False
     model_config = SettingsConfigDict(case_sensitive=True)
 

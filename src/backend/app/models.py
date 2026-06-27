@@ -1,12 +1,20 @@
+from enum import Enum
+
+from pydantic import computed_field
 from sqlmodel import Field, Relationship, SQLModel
 
 
+class Role(str, Enum):
+    admin = "admin"
+    manager = "manager"
+    member = "member"
+
+
 # Shared properties
-# TODO replace email str with EmailStr when sqlmodel supports it
 class UserBase(SQLModel):
     email: str = Field(unique=True, index=True)
     is_active: bool = True
-    is_superuser: bool = False
+    role: Role = Field(default=Role.member)
     full_name: str | None = None
 
 
@@ -15,7 +23,7 @@ class UserCreate(UserBase):
     password: str
 
 
-# TODO replace email str with EmailStr when sqlmodel supports it
+# Properties to receive via API on open registration (no role - always member)
 class UserCreateOpen(SQLModel):
     email: str
     password: str
@@ -23,13 +31,11 @@ class UserCreateOpen(SQLModel):
 
 
 # Properties to receive via API on update, all are optional
-# TODO replace email str with EmailStr when sqlmodel supports it
 class UserUpdate(UserBase):
     email: str | None = None
     password: str | None = None
 
 
-# TODO replace email str with EmailStr when sqlmodel supports it
 class UserUpdateMe(SQLModel):
     full_name: str | None = None
     email: str | None = None
@@ -46,10 +52,21 @@ class User(UserBase, table=True):
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner")
 
+    @property
+    def is_superuser(self) -> bool:
+        """Backward-compatible derived value. Use role checks for new code."""
+        return self.role == Role.admin
+
 
 # Properties to return via API, id is always required
 class UserOut(UserBase):
     id: int
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def is_superuser(self) -> bool:
+        """Backward-compatible derived field for existing API consumers and tests."""
+        return self.role == Role.admin
 
 
 class UsersOut(SQLModel):

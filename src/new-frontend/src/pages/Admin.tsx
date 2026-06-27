@@ -4,7 +4,9 @@ import { Badge, Box, Container, Flex, Heading, Spinner, Table, TableContainer, T
 
 import { ApiError } from '../client';
 import ActionsMenu from '../components/Common/ActionsMenu';
+import Forbidden from '../components/Common/Forbidden';
 import Navbar from '../components/Common/Navbar';
+import useAuth from '../hooks/useAuth';
 import useCustomToast from '../hooks/useCustomToast';
 import { useUserStore } from '../store/user-store';
 import { useUsersStore } from '../store/users-store';
@@ -14,8 +16,10 @@ const Admin: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { users, getUsers } = useUsersStore();
     const { user: currentUser } = useUserStore();
+    const { can } = useAuth();
 
     useEffect(() => {
+        if (!can('user:list')) return;
         const fetchUsers = async () => {
             setIsLoading(true);
             try {
@@ -31,6 +35,8 @@ const Admin: React.FC = () => {
             fetchUsers();
         }
     }, [])
+
+    if (!can('user:list')) return <Forbidden />;
 
     return (
         <>
@@ -62,7 +68,11 @@ const Admin: React.FC = () => {
                                     <Tr key={user.id}>
                                         <Td color={!user.full_name ? 'gray.600' : 'inherit'}>{user.full_name || 'N/A'}{currentUser?.id === user.id && <Badge ml='1' colorScheme='teal'>You</Badge>}</Td>
                                         <Td>{user.email}</Td>
-                                        <Td>{user.is_superuser ? 'Superuser' : 'User'}</Td>
+                                        <Td>
+                                            <Badge colorScheme={user.role === 'admin' ? 'red' : user.role === 'manager' ? 'orange' : 'gray'}>
+                                                {user.role ?? 'member'}
+                                            </Badge>
+                                        </Td>
                                         <Td>
                                             <Flex gap={2}>
                                                 <Box

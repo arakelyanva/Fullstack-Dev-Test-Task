@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
-import { FiBriefcase, FiHome, FiSettings, FiUsers } from 'react-icons/fi';
+import { FiBarChart2, FiBriefcase, FiHome, FiSettings, FiUsers } from 'react-icons/fi';
 import { Link, useLocation } from 'react-router-dom';
 
-import { useUserStore } from '../../store/user-store';
+import useAuth from '../../hooks/useAuth';
 
-const items = [
+const baseItems = [
     { icon: FiHome, title: 'Dashboard', path: "/" },
     { icon: FiBriefcase, title: 'Items', path: "/items" },
     { icon: FiSettings, title: 'User Settings', path: "/settings" },
@@ -20,9 +20,13 @@ const SidebarItems: React.FC<SidebarItemsProps> = ({ onClose }) => {
     const textColor = useColorModeValue("ui.main", "#E2E8F0");
     const bgActive = useColorModeValue("#E2E8F0", "#4A5568");
     const location = useLocation();
-    const { user } = useUserStore();
+    const { can } = useAuth();
 
-    const finalItems = user?.is_superuser ? [...items, { icon: FiUsers, title: 'Admin', path: "/admin" }] : items;
+    const finalItems = [
+        ...baseItems,
+        ...(can('metrics:view') ? [{ icon: FiBarChart2, title: 'Metrics', path: "/metrics" }] : []),
+        ...(can('user:list') ? [{ icon: FiUsers, title: 'Admin', path: "/admin" }] : []),
+    ];
 
     const listItems = finalItems.map((item) => (
         <Flex
