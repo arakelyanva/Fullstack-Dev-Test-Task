@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/react';
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { UserCreate } from '../../client';
@@ -28,7 +28,7 @@ const AddUser: React.FC<AddUserProps> = ({ isOpen, onClose }) => {
             full_name: '',
             password: '',
             confirm_password: '',
-            is_superuser: false,
+            role: 'member',
             is_active: false
         }
     });
@@ -82,12 +82,14 @@ const AddUser: React.FC<AddUserProps> = ({ isOpen, onClose }) => {
                             })} placeholder='Password' type='password' />
                             {errors.confirm_password && <FormErrorMessage>{errors.confirm_password.message}</FormErrorMessage>}
                         </FormControl>
-                        <Flex mt={4}>
+                        <Flex mt={4} gap={4}>
                             <FormControl>
-                                <Checkbox {...register('is_superuser')} colorScheme='teal'>Is superuser?</Checkbox>
-                            </FormControl>
-                            <FormControl>
-                                <Checkbox {...register('is_active')} colorScheme='teal'>Is active?</Checkbox>
+                                <FormLabel htmlFor='role'>Role</FormLabel>
+                                <Select id='role' {...register('role')}>
+                                    <option value='member'>Member</option>
+                                    <option value='manager'>Manager</option>
+                                    <option value='admin'>Admin</option>
+                                </Select>
                             </FormControl>
                         </Flex>
                     </ModalBody>

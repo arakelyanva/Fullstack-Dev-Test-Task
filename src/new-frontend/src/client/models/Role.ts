@@ -3,10 +3,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ItemOut = {
-    title: string;
-    description?: (string | null);
-    id: number;
-    owner_id: number;
-};
-
+export type Role = 'admin' | 'manager' | 'member';

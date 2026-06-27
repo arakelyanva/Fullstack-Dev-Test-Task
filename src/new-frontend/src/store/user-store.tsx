@@ -12,15 +12,15 @@ interface UserStore {
 export const useUserStore = create<UserStore>((set) => ({
     user: null,
     getUser: async () => {
-        const user = await UsersService.readUserMe();
+        const user = await UsersService.usersReadUserMe();
         set({ user });
     },
     editUser: async (user: UserUpdateMe) => {
-        const updatedUser = await UsersService.updateUserMe({ requestBody: user });
+        const updatedUser = await UsersService.usersUpdateUserMe({ requestBody: user });
         set((state) => ({ user: { ...state.user, ...updatedUser } }));
     },
     editPassword: async (password: UpdatePassword) => {
-        await UsersService.updatePasswordMe({ requestBody: password });
+        await UsersService.usersUpdatePasswordMe({ requestBody: password });
     },
     resetUser: () => {
         set({ user: null });

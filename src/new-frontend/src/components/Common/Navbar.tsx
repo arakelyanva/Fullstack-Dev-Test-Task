@@ -5,6 +5,7 @@ import { FaPlus, FaSearch } from "react-icons/fa";
 
 import AddUser from '../Admin/AddUser';
 import AddItem from '../Items/AddItem';
+import useAuth from '../../hooks/useAuth';
 
 interface NavbarProps {
     type: string;
@@ -13,6 +14,9 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ type }) => {
     const addUserModal = useDisclosure();
     const addItemModal = useDisclosure();
+    const { can } = useAuth();
+
+    const canAddUser = type === 'User' && can('user:create');
 
     return (
         <>
@@ -23,10 +27,12 @@ const Navbar: React.FC<NavbarProps> = ({ type }) => {
                     </InputLeftElement>
                     <Input type="text" placeholder="Search" fontSize={{ base: "sm", md: "inherit" }} borderRadius="8px" />
                 </InputGroup>
-                <Button bg="ui.main" color="white" _hover={{ opacity: 0.8 }} gap={1} fontSize={{ base: "sm", md: "inherit" }} onClick={type === "User" ? addUserModal.onOpen : addItemModal.onOpen}>
-                    <Icon as={FaPlus} /> Add {type}
-                </Button>
-                <AddUser isOpen={addUserModal.isOpen} onClose={addUserModal.onClose} />
+                {(type !== 'User' || canAddUser) && (
+                    <Button bg="ui.main" color="white" _hover={{ opacity: 0.8 }} gap={1} fontSize={{ base: "sm", md: "inherit" }} onClick={type === "User" ? addUserModal.onOpen : addItemModal.onOpen}>
+                        <Icon as={FaPlus} /> Add {type}
+                    </Button>
+                )}
+                {canAddUser && <AddUser isOpen={addUserModal.isOpen} onClose={addUserModal.onClose} />}
                 <AddItem isOpen={addItemModal.isOpen} onClose={addItemModal.onClose} />
             </Flex >
         </>

@@ -2,11 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
-export type ItemOut = {
-    title: string;
-    description?: (string | null);
-    id: number;
-    owner_id: number;
-};
-
+export const $Role = {
+    type: 'Enum',
+} as const;

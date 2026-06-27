@@ -13,21 +13,21 @@ interface ItemsStore {
 export const useItemsStore = create<ItemsStore>((set) => ({
     items: [],
     getItems: async () => {
-        const itemsResponse = await ItemsService.readItems({ skip: 0, limit: 10 });
+        const itemsResponse = await ItemsService.itemsReadItems({ skip: 0, limit: 10 });
         set({ items: itemsResponse.data });
     },
     addItem: async (item: ItemCreate) => {
-        const itemResponse = await ItemsService.createItem({ requestBody: item });
+        const itemResponse = await ItemsService.itemsCreateItem({ requestBody: item });
         set((state) => ({ items: [...state.items, itemResponse] }));
     },
     editItem: async (id: number, item: ItemUpdate) => {
-        const itemResponse = await ItemsService.updateItem({ id: id, requestBody: item });
+        const itemResponse = await ItemsService.itemsUpdateItem({ id: id, requestBody: item });
         set((state) => ({
             items: state.items.map((item) => (item.id === id ? itemResponse : item))
         }));
     },
     deleteItem: async (id: number) => {
-        await ItemsService.deleteItem({ id });
+        await ItemsService.itemsDeleteItem({ id });
         set((state) => ({ items: state.items.filter((item) => item.id !== id) }));
     },
     resetItems: () => {

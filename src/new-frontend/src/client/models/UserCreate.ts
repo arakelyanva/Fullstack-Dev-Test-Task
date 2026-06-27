@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { Role } from './Role';
+
 export type UserCreate = {
     email: string;
     is_active?: boolean;
-    is_superuser?: boolean;
+    role?: Role;
     full_name?: (string | null);
     password: string;
 };
+

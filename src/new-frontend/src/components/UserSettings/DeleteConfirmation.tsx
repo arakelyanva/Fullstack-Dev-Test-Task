@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
-import { ApiError } from '../../client';
+import { ApiError, UsersService } from '../../client';
 import useAuth from '../../hooks/useAuth';
 import useCustomToast from '../../hooks/useCustomToast';
 import { useUserStore } from '../../store/user-store';
@@ -16,12 +16,12 @@ const DeleteConfirmation: React.FC<DeleteProps> = ({ isOpen, onClose }) => {
     const showToast = useCustomToast();
     const cancelRef = React.useRef<HTMLButtonElement | null>(null);
     const { handleSubmit, formState: { isSubmitting } } = useForm();
-    const { user, deleteUser } = useUserStore();
+    const { user } = useUserStore();
     const { logout } = useAuth();
 
     const onSubmit = async () => {
         try {
-            await deleteUser(user!.id);
+            await UsersService.usersDeleteUser({ userId: user!.id });
             logout();
             onClose();
             showToast('Success', 'Your account has been successfully deleted.', 'success');

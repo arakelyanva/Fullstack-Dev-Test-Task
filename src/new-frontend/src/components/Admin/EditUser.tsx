@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Checkbox, Flex, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/react';
+import { Button, Flex, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { ApiError, UserUpdate } from '../../client';
@@ -29,7 +29,7 @@ const EditUser: React.FC<EditUserProps> = ({ user_id, isOpen, onClose }) => {
             full_name: currentUser?.full_name,
             password: '',
             confirm_password: '',
-            is_superuser: currentUser?.is_superuser,
+            role: currentUser?.role,
             is_active: currentUser?.is_active
         }
     });
@@ -89,12 +89,14 @@ const EditUser: React.FC<EditUserProps> = ({ user_id, isOpen, onClose }) => {
                             })} placeholder='••••••••' type='password' />
                             {errors.confirm_password && <FormErrorMessage>{errors.confirm_password.message}</FormErrorMessage>}
                         </FormControl>
-                        <Flex>
-                            <FormControl mt={4}>
-                                <Checkbox {...register('is_superuser')} colorScheme='teal'>Is superuser?</Checkbox>
-                            </FormControl>
-                            <FormControl mt={4}>
-                                <Checkbox {...register('is_active')} colorScheme='teal'>Is active?</Checkbox>
+                        <Flex mt={4} gap={4}>
+                            <FormControl>
+                                <FormLabel htmlFor='role'>Role</FormLabel>
+                                <Select id='role' {...register('role')}>
+                                    <option value='member'>Member</option>
+                                    <option value='manager'>Manager</option>
+                                    <option value='admin'>Admin</option>
+                                </Select>
                             </FormControl>
                         </Flex>
                     </ModalBody>
